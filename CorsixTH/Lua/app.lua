@@ -1575,7 +1575,15 @@ end
 --!return Name of the directory containing the bitmap files, ending with a
 --        directory path separator.
 function App:getBitmapDir()
-  return (self.command_line["bitmap-dir"] or "Bitmap") .. pathsep
+  if self.command_line and self.command_line["bitmap-dir"] then
+    return self.command_line["bitmap-dir"] .. pathsep
+  end
+  local sibling_bitmap = self:getFullPath("Bitmap", true)
+  if sibling_bitmap and lfs and lfs.attributes and
+      lfs.attributes(sibling_bitmap:sub(1, -2), "mode") == "directory" then
+    return sibling_bitmap
+  end
+  return "Bitmap" .. pathsep
 end
 
 -- Load bitmap data into memory.
